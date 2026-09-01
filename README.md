@@ -204,6 +204,9 @@ Raw Inspect logs (`results/logs/`) are gitignored for size. The diagnostic JSONL
 git SHA, model, full config, the complete rendered prompt, the layout as a role→slot
 mapping, the full raw completion, reasoning tokens, and the extracted letter.
 
+The `git_sha` values recorded in `diagnostics/` refer to pre-publication history and do
+not resolve against this repository.
+
 ```bash
 pytest          # 35 tests: dataset integrity, seeded shuffling, letter extraction
 ```

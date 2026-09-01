@@ -37,6 +37,34 @@ def recover_answer(item: dict, candidate: dict) -> str:
     return hits[0]
 
 
+# Which source field each option text came from. Recorded in the dataset so the
+# repo is self-contained: downstream tooling can identify the literal reading
+# and the two distractors without re-reading the (unpublished) source files.
+ROLE_FIELDS = {
+    "PRAG": "pragmatic_interpretation",
+    "LIT": "literal_interpretation",
+    "D1": "distractor_1",
+    "D2": "distractor_2",
+}
+
+
+def recover_roles(item: dict, candidate: dict) -> dict[str, str]:
+    """Map each role (PRAG/LIT/D1/D2) to the option letter carrying its text."""
+    roles: dict[str, str] = {}
+    for role, field in ROLE_FIELDS.items():
+        target = normalize(candidate[field])
+        hits = [L for L in LETTERS if normalize(item[f"option_{L}"]) == target]
+        if len(hits) != 1:
+            raise ValueError(
+                f"{item['item_id']}: {field} matched {len(hits)} options {hits}; "
+                "expected exactly 1. Refusing to guess."
+            )
+        roles[role] = hits[0]
+    if sorted(roles.values()) != list(LETTERS):
+        raise ValueError(f"{item['item_id']}: roles do not cover A-D exactly: {roles}")
+    return roles
+
+
 def build(source_dir: Path, out_path: Path) -> list[dict]:
     items = json.loads((source_dir / "mcq_questions.json").read_text(encoding="utf-8"))
     candidates = {
@@ -49,6 +77,7 @@ def build(source_dir: Path, out_path: Path) -> list[dict]:
         item_id = item["item_id"]
         if item_id not in candidates:
             raise ValueError(f"{item_id}: no matching candidate record for key recovery.")
+        candidate = candidates[item_id]
         records.append(
             {
                 "item_id": item_id,
@@ -57,7 +86,8 @@ def build(source_dir: Path, out_path: Path) -> list[dict]:
                 "target_speaker": item["target_speaker"],
                 "target_text": item["target_text"],
                 "options": {L: item[f"option_{L}"] for L in LETTERS},
-                "answer": recover_answer(item, candidates[item_id]),
+                "answer": recover_answer(item, candidate),
+                "roles": recover_roles(item, candidate),
             }
         )
 

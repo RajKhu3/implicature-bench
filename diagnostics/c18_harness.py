@@ -51,21 +51,27 @@ def git_sha() -> str:
         return "UNKNOWN"
 
 
+DATASET = REPO / "data" / "implicature_bench.jsonl"
+
+
 def load_item(item_id: str = "C18") -> tuple[dict, dict[str, str]]:
-    src = pathlib.Path(
-        r"C:\Users\R\Desktop\raj_system_final\Phil 499 capstone\Phil 499 capstone"
-    )
-    mcq = {x["item_id"]: x for x in json.loads((src / "mcq_questions.json").read_text(encoding="utf-8"))}
-    cand = {x["candidate_id"]: x for x in json.loads((src / "candidates_raw.json").read_text(encoding="utf-8"))}
-    item = mcq[item_id]
-    c = cand[item_id]
-    roles = {
-        "PRAG": c["pragmatic_interpretation"],
-        "LIT": c["literal_interpretation"],
-        "D1": c["distractor_1"],
-        "D2": c["distractor_2"],
-    }
-    return item, roles
+    """Load one item from the committed dataset.
+
+    Returns (item, roles) where roles maps PRAG/LIT/D1/D2 to option TEXT. The
+    dataset records each role's option letter, so no external source files are
+    needed and these diagnostics are runnable from a clone.
+    """
+    records = [
+        json.loads(line)
+        for line in DATASET.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    by_id = {r["item_id"]: r for r in records}
+    if item_id not in by_id:
+        raise KeyError(f"{item_id} not found in {DATASET}")
+    record = by_id[item_id]
+    roles = {role: record["options"][letter] for role, letter in record["roles"].items()}
+    return record, roles
 
 
 async def run_layout(model_name, item, roles, layout_name, order, n, out_path, sha):
