@@ -26,3 +26,6 @@ Thumbs.db
 .idea/
 .vscode/
 *.swp
+
+# Inspect raw eval logs are large; summaries + diagnostic JSONL are committed.
+results/logs/
