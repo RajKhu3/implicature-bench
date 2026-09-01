@@ -43,7 +43,7 @@ DEFAULT_EPOCHS = 3
 
 @task
 def implicature_bench(
-    dataset_path: str = "data/implicature_bench.jsonl",
+    dataset_path: str | None = None,
     seed: int = DEFAULT_SEED,
     shuffle: bool = True,
     epochs: int = DEFAULT_EPOCHS,

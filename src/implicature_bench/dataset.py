@@ -57,12 +57,17 @@ def record_to_sample(record: dict, seed: int, shuffle: bool) -> Sample:
     )
 
 
+# Repo root, so the default dataset resolves no matter the working directory.
+_REPO_ROOT = Path(__file__).resolve().parents[2]
+DEFAULT_DATASET = _REPO_ROOT / "data" / "implicature_bench.jsonl"
+
+
 def implicature_dataset(
-    path: str | Path = "data/implicature_bench.jsonl",
+    path: str | Path | None = None,
     seed: int = DEFAULT_SEED,
     shuffle: bool = True,
 ) -> Dataset:
-    path = Path(path)
+    path = Path(path) if path is not None else DEFAULT_DATASET
     records = [
         json.loads(line) for line in path.read_text(encoding="utf-8").splitlines() if line.strip()
     ]
