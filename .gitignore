@@ -1,0 +1,28 @@
+# --- secrets ---
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+
+# --- inspect scratch ---
+# Committed runs live in results/. Inspect's working log dir is scratch.
+logs/
+.inspect/
+
+# --- python ---
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+build/
+dist/
+
+# --- os / editor ---
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
