@@ -65,8 +65,9 @@ as missed.
 For contrast, the paper evaluated BLOOMZ-7.1B on the same 25 items: **32%** under
 free-generation scoring and **36%** under logit scoring.
 
-**The MCQ format is saturated at the frontier.** It no longer discriminates between
-these models.
+Under the original option order, all five evaluated models achieved 25/25 items correct
+by modal answer on this benchmark. Under a seeded reshuffle, three of five models missed
+one item by modal answer.
 
 ## Robustness — seeded option shuffle
 
